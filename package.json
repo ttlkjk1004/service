@@ -1,0 +1,16 @@
+{
+    "name": "service-report-monorepo",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "install:server": "cd server && npm install",
+        "install:client": "cd client && npm install",
+        "install:all": "npm run install:server && npm run install:client",
+        "start:server": "cd server && npm start",
+        "start:client": "cd client && npm run dev",
+        "build:client": "cd client && npm run build"
+    },
+    "description": "Service Report Application - Full Stack",
+    "author": "",
+    "license": "ISC"
+}

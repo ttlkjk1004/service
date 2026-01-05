@@ -1,0 +1,240 @@
+:root {
+  --primary-color: #6366f1;
+  --secondary-color: #a855f7;
+  --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.3);
+  --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  --text-color: #1f2937;
+  --input-bg: rgba(255, 255, 255, 0.9);
+  --border-color: #000;
+  /* Strict black border for report */
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-gradient);
+  color: var(--text-color);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  max-width: 1000px;
+  /* Wider for the form */
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+h1,
+h2,
+h3 {
+  background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 800;
+  margin-top: 0;
+}
+
+/* Report Form Specific Styles */
+.report-paper {
+  background: white;
+  padding: 40px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  max-width: 210mm;
+  /* A4 width approx */
+  margin: 0 auto;
+  font-family: 'Arial', sans-serif;
+  /* Standard document font */
+  color: #000;
+}
+
+.report-header-title {
+  text-align: right;
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #000;
+  -webkit-text-fill-color: #000;
+  /* Override transparent text */
+}
+
+.report-grid {
+  display: border-box;
+  border: 2px solid var(--border-color);
+}
+
+.grid-row {
+  display: flex;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.grid-row:last-child {
+  border-bottom: none;
+}
+
+.cell {
+  padding: 5px;
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+}
+
+.cell:last-child {
+  border-right: none;
+}
+
+.cell.label {
+  background-color: #fff;
+  font-weight: bold;
+  justify-content: center;
+  min-width: 120px;
+}
+
+.cell.content {
+  flex: 1;
+}
+
+.cell.content input[type="text"],
+.cell.content input[type="date"],
+.cell.content textarea {
+  width: 100%;
+  border: none;
+  background: transparent;
+  margin: 0;
+  padding: 5px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.cell.content input:focus,
+.cell.content textarea:focus {
+  outline: none;
+  background: rgba(0, 0, 0, 0.05);
+  box-shadow: none;
+}
+
+/* Specific Height adjustments */
+.h-large {
+  height: 150px;
+  align-items: flex-start;
+}
+
+.h-medium {
+  height: 100px;
+  align-items: flex-start;
+}
+
+/* Table Styles within the form */
+.inner-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.inner-table th,
+.inner-table td {
+  border: 1px solid var(--border-color);
+  padding: 5px;
+  text-align: center;
+}
+
+.inner-table th {
+  background: #f9f9f9;
+  font-weight: bold;
+}
+
+.inner-table input {
+  width: 100%;
+  border: none;
+  text-align: center;
+}
+
+/* Checkbox alignment */
+.checkbox-group {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+/* Utility */
+.full-width {
+  width: 100%;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.no-border-bottom {
+  border-bottom: none !important;
+}
+
+/* Nav */
+.nav-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: var(--text-color);
+  margin-left: 1.5rem;
+  font-weight: 600;
+}
+
+/* Report List Table Styles */
+.report-list-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.report-list-table th,
+.report-list-table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+
+.report-list-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+  color: #333;
+}
+
+.report-list-table tr:hover {
+  background-color: #f5f5f5;
+  cursor: pointer;
+}
+
+.report-list-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.delete-btn {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.delete-btn:hover {
+  background-color: #dc2626;
+}
