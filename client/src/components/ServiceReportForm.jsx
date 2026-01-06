@@ -201,14 +201,16 @@ function ServiceReportForm() {
 
     return (
         <div className="report-paper animate-fade-in">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+            <div className="report-header-container">
                 <div className="logo-section">
                     <img src={logo} alt="Withus Meditech Logo" style={{ maxWidth: '250px', height: 'auto' }} />
                 </div>
-                <div className="header-info" style={{ textAlign: 'right' }}>
-                    <h1 className="report-header-title print-hide" style={{ margin: 0, marginBottom: '10px' }}>{id ? 'Edit Service Report' : 'Service Report'}</h1>
-                    <div style={{ textAlign: 'right' }}>
-                        Date : <input type="date" value={serviceDate} onChange={(e) => setServiceDate(e.target.value)} style={{ border: 'none', borderBottom: '1px solid black' }} />
+                <div className="header-info">
+                    <h1 className="report-header-title print-hide">
+                        {id ? 'Edit Service Report' : 'Service Report'}
+                    </h1>
+                    <div className="date-input-wrapper">
+                        Date : <input type="date" value={serviceDate} className="date-input" onChange={(e) => setServiceDate(e.target.value)} />
                     </div>
                 </div>
             </div>

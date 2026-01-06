@@ -539,6 +539,34 @@ h3 {
   }
 }
 
+/* Report Header Styles */
+.report-header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.header-info {
+  text-align: right;
+}
+
+.report-header-title {
+  margin: 0;
+  margin-bottom: 10px;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.date-input-wrapper {
+  text-align: right;
+}
+
+.date-input {
+  border: none;
+  border-bottom: 1px solid black;
+}
+
 /* Mobile Responsiveness */
 @media screen and (max-width: 768px) {
   .container {
@@ -547,35 +575,70 @@ h3 {
     box-sizing: border-box;
   }
 
+  /* Navigation: Single line on mobile */
   .nav-header {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: 1rem;
   }
 
   .nav-links {
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    flex-direction: row;
+    justify-content: center;
+    gap: 1rem;
     width: 100%;
+    flex-wrap: wrap;
   }
 
   .nav-links a {
     margin-left: 0;
-    padding: 0.5rem 0;
-    display: block;
+    padding: 0.5rem;
+    display: inline-block;
+    width: auto;
+    font-size: 0.9rem;
+  }
+
+  /* Report Header Mobile */
+  .report-header-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .logo-section img {
+    max-width: 200px !important;
+    /* Slightly smaller logo */
+  }
+
+  .header-info {
+    text-align: center;
     width: 100%;
+  }
+
+  .report-header-title {
+    font-size: 1.5rem;
+    text-align: center !important;
+    margin-bottom: 15px;
+  }
+
+  .date-input-wrapper {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .date-input {
+    width: auto;
+    max-width: 100%;
   }
 
   .report-paper {
     padding: 15px;
     width: 100%;
     box-sizing: border-box;
-  }
-
-  .report-header-title {
-    font-size: 1.5rem;
-    text-align: center;
   }
 
   /* Stack Grid Rows */
