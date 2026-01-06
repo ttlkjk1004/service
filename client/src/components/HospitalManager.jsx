@@ -17,7 +17,7 @@ const HospitalManager = () => {
         software_version: ''
     });
 
-    const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:3000') + '/api/hospitals';
+    const apiUrl = '/api/hospitals';
 
     useEffect(() => {
         fetchHospitals();
