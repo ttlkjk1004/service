@@ -641,14 +641,14 @@ h3 {
     box-sizing: border-box;
   }
 
-  /* Stack Grid Rows */
+  /* Stack Grid Rows - Modified to Side-by-Side */
   .grid-row {
     flex-wrap: wrap;
     border-bottom: 2px solid var(--border-color);
   }
 
   .cell {
-    width: 100%;
+    /* Default to side-by-side flex behavior */
     border-right: none;
     border-bottom: 1px solid #eee;
   }
@@ -659,25 +659,46 @@ h3 {
 
   .cell.label {
     background-color: #f3f4f6;
-    justify-content: flex-start;
+    justify-content: center;
+    /* Center label text like desktop */
     padding: 8px;
-    min-width: auto;
+    width: 30%;
+    /* Fixed width for labels */
+    box-sizing: border-box;
+    border-right: 1px solid #eee;
+    /* Add separator */
   }
 
   .cell.content {
     padding: 8px;
+    width: 70%;
+    /* Remaining width for content */
+    box-sizing: border-box;
   }
 
-  /* Specifically for the "Type of activity" section */
-  .cell.h-medium {
-    min-height: auto;
+  /* Handle rows with 4 items (Label | Content | Label | Content) 
+     Force them to wrap into 2 rows of (Label | Content) */
+  .grid-row .cell.label:nth-child(3) {
+    border-top: 1px solid #eee;
+  }
+
+  /* Specifically for the "Type of activity" section 
+     This usually spans full width, so we might want to keep it readable */
+  .grid-row:has(.h-medium) .cell.label {
+    width: 30%;
+  }
+
+  .grid-row:has(.h-medium) .cell.content {
+    width: 70%;
   }
 
   .checkbox-group {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: 1fr 1fr !important;
+    /* 2 columns for checkboxes */
   }
 
-  /* Hospital Manager Form Stack */
+  /* Hospital Manager Form Stack - Keep single column for simple inputs if needed, 
+     but user asked for desktop look. Let's keep this as is for now as it wasn't the main focus. */
   .hospital-form .form-grid {
     grid-template-columns: 1fr;
   }
@@ -686,18 +707,26 @@ h3 {
     grid-column: span 1;
   }
 
-  /* Signature Section Stack */
+  /* Signature Section - Side by Side */
   .signature-section {
-    flex-direction: column;
-    gap: 2rem;
+    flex-direction: row;
+    /* Back to row */
+    gap: 10px;
+    justify-content: space-between;
   }
 
   .signature-section>div {
-    width: 100% !important;
+    width: 48% !important;
+    /* Side by side */
   }
 
   .signature-name-group input {
     width: 100% !important;
+  }
+
+  .signature-pad-wrapper canvas {
+    width: 100%;
+    /* Ensure canvas fits */
   }
 
   /* Tables Scroll */
