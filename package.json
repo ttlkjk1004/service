@@ -8,7 +8,8 @@
         "install:all": "npm run install:server && npm run install:client",
         "start:server": "cd server && npm start",
         "start:client": "cd client && npm run dev",
-        "build:client": "cd client && npm run build"
+        "build:client": "cd client && npm run build",
+        "build": "npm run install:all && npm run build:client"
     },
     "description": "Service Report Application - Full Stack",
     "author": "",
