@@ -1,4 +1,5 @@
 :root {
+  color-scheme: light;
   --primary-color: #6366f1;
   --secondary-color: #a855f7;
   --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
@@ -569,6 +570,10 @@ h3 {
 
 /* Mobile Responsiveness */
 @media screen and (max-width: 768px) {
+  body {
+    background: white !important;
+  }
+
   .container {
     padding: 1rem;
     width: 100%;
