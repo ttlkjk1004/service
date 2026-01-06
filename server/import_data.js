@@ -35,7 +35,10 @@ try {
 
     // Import Data
     db.serialize(() => {
-        const stmt = db.prepare("INSERT INTO hospitals (name, address, city, region) VALUES (?, ?, ?, ?)");
+        const stmt = db.prepare(`INSERT INTO hospitals (
+            name, location, products, system, installation_date, 
+            device_type, serial_number, revision_firmware, software_version
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`);
 
         let successCount = 0;
         let errorCount = 0;
@@ -43,19 +46,28 @@ try {
         db.run("BEGIN TRANSACTION");
 
         data.forEach((row, index) => {
-            // Map Korean headers
-            const name = row['병원이름'];
-            const region = row['지역'];
-            const city = row['세부지역'];
-            const address = `${region} ${city}`; // Construct simple address
+            // Map headers based on "Hospital_data.xlsx"
+            // Headers: Customer, Location, Products, System, Installation date, Device type, Serial number, Revision/Firmware, Software version
+            const name = row['Customer'];
+            const location = row['Location'];
+            const products = row['Products'];
+            const system = row['System'];
+            const installationDate = row['Installation date']; // Note: Excel dates might need parsing if not string
+            const deviceType = row['Device type'];
+            const serialNumber = row['Serial number'];
+            const revisionFirmware = row['Revision/Firmware'];
+            const softwareVersion = row['Software version'];
 
             if (name) {
-                stmt.run(name, address, city, region, (err) => {
-                    if (err) {
-                        // console.error(`Error inserting row ${index + 2}: ${err.message}`);
-                        errorCount++;
-                    }
-                });
+                stmt.run(
+                    name, location, products, system, installationDate,
+                    deviceType, serialNumber, revisionFirmware, softwareVersion,
+                    (err) => {
+                        if (err) {
+                            // console.error(`Error inserting row ${index + 2}: ${err.message}`);
+                            errorCount++;
+                        }
+                    });
                 successCount++;
             }
         });

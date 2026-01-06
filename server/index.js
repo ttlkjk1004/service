@@ -10,17 +10,99 @@ app.use(express.json());
 
 // API Endpoints
 
-// Search Hospitals
+// Search or List Hospitals
 app.get('/api/hospitals', (req, res) => {
     const { query } = req.query;
     if (!query) {
-        return res.json([]);
+        db.all(`SELECT * FROM hospitals ORDER BY name`, [], (err, rows) => {
+            if (err) {
+                return res.status(500).json({ error: err.message });
+            }
+            res.json(rows);
+        });
+        return;
     }
-    db.all(`SELECT * FROM hospitals WHERE name LIKE ?`, [`%${query}%`], (err, rows) => {
+    db.all(`SELECT * FROM hospitals WHERE name LIKE ? ORDER BY name`, [`%${query}%`], (err, rows) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
         res.json(rows);
+    });
+});
+
+// Add Hospital
+app.post('/api/hospitals', (req, res) => {
+    console.log('POST /api/hospitals received:', req.body);
+    const {
+        name, location, products, system, installation_date,
+        device_type, serial_number, revision_firmware, software_version
+    } = req.body;
+
+    if (!name) {
+        return res.status(400).json({ error: 'Hospital name is required' });
+    }
+    const sql = `INSERT INTO hospitals (
+        name, location, products, system, installation_date, 
+        device_type, serial_number, revision_firmware, software_version
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+    db.run(sql, [
+        name, location, products, system, installation_date,
+        device_type, serial_number, revision_firmware, software_version
+    ], function (err) {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({
+            id: this.lastID, name, location, products, system, installation_date,
+            device_type, serial_number, revision_firmware, software_version
+        });
+    });
+});
+
+// Update Hospital
+app.put('/api/hospitals/:id', (req, res) => {
+    const { id } = req.params;
+    const {
+        name, location, products, system, installation_date,
+        device_type, serial_number, revision_firmware, software_version
+    } = req.body;
+
+    if (!name) {
+        return res.status(400).json({ error: 'Hospital name is required' });
+    }
+    const sql = `UPDATE hospitals SET 
+        name = ?, location = ?, products = ?, system = ?, installation_date = ?, 
+        device_type = ?, serial_number = ?, revision_firmware = ?, software_version = ? 
+        WHERE id = ?`;
+
+    db.run(sql, [
+        name, location, products, system, installation_date,
+        device_type, serial_number, revision_firmware, software_version,
+        id
+    ], function (err) {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (this.changes === 0) {
+            return res.status(404).json({ error: 'Hospital not found' });
+        }
+        res.json({ message: 'Hospital updated successfully' });
+    });
+});
+
+// Delete Hospital
+app.delete('/api/hospitals/:id', (req, res) => {
+    const { id } = req.params;
+    console.log(`DELETE /api/hospitals/${id} received`);
+    db.run('DELETE FROM hospitals WHERE id = ?', [id], function (err) {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (this.changes === 0) {
+            return res.status(404).json({ error: 'Hospital not found' });
+        }
+        res.json({ message: 'Hospital deleted successfully' });
     });
 });
 

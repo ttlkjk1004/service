@@ -47,7 +47,25 @@ h3 {
   margin: 0 auto;
   font-family: 'Arial', sans-serif;
   /* Standard document font */
-  color: #000;
+  color: #000 !important;
+  -webkit-print-color-adjust: exact;
+}
+
+/* Force high contrast for PDF generation */
+.report-paper * {
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+  border-color: #000 !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+
+.report-paper input,
+.report-paper textarea,
+.report-paper select {
+  background-color: transparent !important;
+  color: #000 !important;
+  opacity: 1 !important;
 }
 
 .report-header-title {
@@ -107,6 +125,9 @@ h3 {
   font-size: 14px;
   font-family: inherit;
   resize: vertical;
+  color: #000 !important;
+  -webkit-text-fill-color: #000;
+  opacity: 1;
 }
 
 .cell.content input:focus,
@@ -118,12 +139,12 @@ h3 {
 
 /* Specific Height adjustments */
 .h-large {
-  height: 150px;
+  min-height: 150px;
   align-items: flex-start;
 }
 
 .h-medium {
-  height: 100px;
+  min-height: 100px;
   align-items: flex-start;
 }
 
@@ -237,4 +258,283 @@ h3 {
 
 .delete-btn:hover {
   background-color: #dc2626;
+}
+
+/* Hospital Manager Styles */
+.card {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  border: var(--glass-border);
+}
+
+.section-title {
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.hospital-form .form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group.full-width {
+  grid-column: span 3;
+}
+
+.form-group label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #4b5563;
+}
+
+.form-group input {
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.btn-primary {
+  background: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: #9ca3af;
+  color: white;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.report-table th,
+.report-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.report-table th {
+  background: #f9fafb;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: background 0.2s;
+}
+
+.btn-icon.edit {
+  background: #eef2ff;
+  color: var(--primary-color);
+}
+
+.btn-icon.edit:hover {
+  background: #e0e7ff;
+}
+
+.btn-icon.delete {
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+.btn-icon.delete:hover {
+  background: #fee2e2;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  /* 
+     Aggressive Reset: Hide everything in the body by default.
+     This ensures Nav bars, Sidebars, and anything else outside the report is gone.
+  */
+  body * {
+    visibility: hidden;
+  }
+
+  /* 
+     Make the report container and its children visible.
+     We position it at the absolute top-left to fill the page.
+  */
+  .report-paper,
+  .report-paper * {
+    visibility: visible;
+  }
+
+  .report-paper {
+    position: static;
+    /* Use normal flow to respect margins */
+    width: 100%;
+    margin: 0;
+    padding: 0 !important;
+    /* Let the container handle padding, or minimize it */
+    box-shadow: none;
+    max-width: none !important;
+    box-sizing: border-box;
+    /* Ensure padding doesn't add to width */
+    border: none;
+  }
+
+  /* Ensure the grid doesn't overflow */
+  .report-grid {
+    width: 100%;
+    box-sizing: border-box;
+    border: 2px solid #000 !important;
+    /* Enforce global border */
+  }
+
+  /*
+     Specific internal elements we want to hide even if they are inside the report.
+     We use display: none !important to remove them from layout entirely.
+  */
+  .print-hide,
+  .report-header-title,
+  .action-buttons-container,
+  button,
+  .nav-header {
+    display: none !important;
+  }
+
+  /* Reduce generic padding */
+  .report-paper {
+    padding: 0 !important;
+    /* Minimized padding to allow grid to use space */
+  }
+
+  .report-header-title {
+    margin-bottom: 5px !important;
+    /* Minimized spacing */
+    font-size: 1.5rem !important;
+  }
+
+  .h-large {
+    min-height: 125px !important;
+    /* increased from 100px to fill space */
+    height: auto !important;
+  }
+
+  /* Compact Signature properties */
+  .signature-section {
+    margin-top: 25px !important;
+    /* increased from 10px to push to bottom */
+    page-break-inside: avoid !important;
+    page-break-before: avoid !important;
+    /* Try to keep with previous content */
+  }
+
+  /* Tighten cell padding to save vertical space */
+  .cell,
+  .inner-table th,
+  .inner-table td {
+    padding: 3px !important;
+  }
+
+  .signature-name-group {
+    margin-bottom: 5px !important;
+  }
+
+  .signature-pad-wrapper {
+    margin-bottom: 0 !important;
+  }
+
+  /* Ensure signature pads fit */
+  .signature-pad-wrapper canvas {
+    max-height: 100px;
+  }
+
+  /* Reset inputs for clean print */
+  input,
+  textarea,
+  select {
+    border: none !important;
+    background: transparent !important;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding: 0 !important;
+    resize: none;
+    overflow: hidden;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: transparent !important;
+  }
 }

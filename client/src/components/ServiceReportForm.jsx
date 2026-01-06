@@ -103,8 +103,22 @@ function ServiceReportForm() {
     const handleHospitalSelect = (hospital) => {
         setHospitalId(hospital.id);
         setHospitalName(hospital.name);
-        const loc = hospital.address || `${hospital.region || ''} ${hospital.city || ''}`.trim();
-        setLocation(loc);
+        setLocation(hospital.location || '');
+        setProducts(hospital.products || '');
+        setSystem(hospital.system || '');
+
+        // Auto-fill device details if available from hospital data
+        if (hospital.device_type || hospital.serial_number || hospital.revision_firmware || hospital.software_version) {
+            const newDeviceDetails = [...deviceDetails];
+            // Use the first row for valid details
+            newDeviceDetails[0] = {
+                type: hospital.device_type || '',
+                serial: hospital.serial_number || '',
+                firmware: hospital.revision_firmware || '',
+                software: hospital.software_version || ''
+            };
+            setDeviceDetails(newDeviceDetails);
+        }
     };
 
     const handleDeviceChange = (index, field, value) => {
@@ -123,6 +137,21 @@ function ServiceReportForm() {
         const newHours = [...serviceHours];
         newHours[index][field] = value;
         setServiceHours(newHours);
+    };
+
+    const handleSavePdf = () => {
+        // Default filename: System_Date.pdf. Fallback to ServiceReport_Date if System is empty.
+        const safeSystem = system ? system.replace(/[^a-z0-9]/gi, '_') : 'ServiceReport';
+        const filename = `${safeSystem}_${serviceDate}.pdf`;
+
+        // Change document title to affect the default filename in print dialog
+        const originalTitle = document.title;
+        document.title = filename.replace('.pdf', ''); // Browser adds .pdf automatically usually
+
+        window.print();
+
+        // Restore title
+        document.title = originalTitle;
     };
 
     const handleSubmit = async (e) => {
@@ -177,7 +206,7 @@ function ServiceReportForm() {
                     <img src={logo} alt="Withus Meditech Logo" style={{ maxWidth: '250px', height: 'auto' }} />
                 </div>
                 <div className="header-info" style={{ textAlign: 'right' }}>
-                    <h1 className="report-header-title" style={{ margin: 0, marginBottom: '10px' }}>{id ? 'Edit Service Report' : 'Service Report'}</h1>
+                    <h1 className="report-header-title print-hide" style={{ margin: 0, marginBottom: '10px' }}>{id ? 'Edit Service Report' : 'Service Report'}</h1>
                     <div style={{ textAlign: 'right' }}>
                         Date : <input type="date" value={serviceDate} onChange={(e) => setServiceDate(e.target.value)} style={{ border: 'none', borderBottom: '1px solid black' }} />
                     </div>
@@ -266,7 +295,7 @@ function ServiceReportForm() {
 
                 {/* Row 5: Subject */}
                 <div className="grid-row">
-                    <div className="cell label" style={{ minWidth: '80px', justifyContent: 'flex-start' }}>Subject</div>
+                    <div className="cell label" style={{ width: '100px', justifyContent: 'flex-start' }}>Subject</div>
                     <div className="cell content">
                         <input type="text" value={subject} onChange={(e) => setSubject(e.target.value)} />
                     </div>
@@ -274,7 +303,7 @@ function ServiceReportForm() {
 
                 {/* Row 6: Activity */}
                 <div className="grid-row">
-                    <div className="cell label h-large" style={{ minWidth: '80px', justifyContent: 'flex-start' }}>Activity</div>
+                    <div className="cell label h-large" style={{ width: '100px', justifyContent: 'flex-start' }}>Activity</div>
                     <div className="cell content h-large">
                         <textarea style={{ height: '100%' }} value={serviceDetails} onChange={(e) => setServiceDetails(e.target.value)}></textarea>
                     </div>
@@ -342,26 +371,29 @@ function ServiceReportForm() {
             </form>
 
             {/* Footer: Signatures */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
+            <div className="signature-section" style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
                 <div style={{ width: '45%' }}>
-                    <div style={{ marginBottom: '20px' }}>
+                    <div className="signature-name-group" style={{ marginBottom: '20px' }}>
                         Servicer Name: <input type="text" value={servicerName} onChange={(e) => setServicerName(e.target.value)} style={{ border: 'none', borderBottom: '1px solid black', width: '200px' }} />
                     </div>
-                    <div style={{ marginBottom: '5px' }}>
-                        <SignaturePad value={servicerSignature} onChange={setServicerSignature} />
+                    <div className="signature-pad-wrapper" style={{ marginBottom: '5px' }}>
+                        <SignaturePad value={servicerSignature} onChange={setServicerSignature} height={100} />
                     </div>
                 </div>
                 <div style={{ width: '45%' }}>
-                    <div style={{ marginBottom: '20px' }}>
+                    <div className="signature-name-group" style={{ marginBottom: '20px' }}>
                         Customer Name: <input type="text" value={customerName} onChange={(e) => setCustomerName(e.target.value)} style={{ border: 'none', borderBottom: '1px solid black', width: '200px' }} />
                     </div>
-                    <div style={{ marginBottom: '5px' }}>
-                        <SignaturePad value={customerSignature} onChange={setCustomerSignature} />
+                    <div className="signature-pad-wrapper" style={{ marginBottom: '5px' }}>
+                        <SignaturePad value={customerSignature} onChange={setCustomerSignature} height={100} />
                     </div>
                 </div>
             </div>
 
-            <div style={{ textAlign: 'center', marginTop: '30px', display: 'flex', justifyContent: 'center', gap: '20px' }}>
+            <div className="action-buttons-container print-hide" style={{ textAlign: 'center', marginTop: '30px', display: 'flex', justifyContent: 'center', gap: '20px' }} data-html2canvas-ignore="true">
+                <button type="button" onClick={handleSavePdf} style={{ padding: '10px 40px', fontSize: '1.2rem', cursor: 'pointer', backgroundColor: '#17a2b8', color: 'white', border: 'none' }}>
+                    Save to PDF
+                </button>
                 <button onClick={handleSubmit} style={{ padding: '10px 40px', fontSize: '1.2rem', cursor: 'pointer' }}>
                     {id ? 'Update Report' : 'Save Report'}
                 </button>

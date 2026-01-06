@@ -18,9 +18,14 @@ db.serialize(() => {
     db.run(`CREATE TABLE IF NOT EXISTS hospitals (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
-        address TEXT,
-        city TEXT,
-        region TEXT
+        location TEXT,
+        products TEXT,
+        system TEXT,
+        installation_date TEXT,
+        device_type TEXT,
+        serial_number TEXT,
+        revision_firmware TEXT,
+        software_version TEXT
     )`);
 
     // Reports Table - Dropping old table for schema update (Dev mode only)
@@ -53,14 +58,14 @@ db.serialize(() => {
         if (err) return console.error(err.message);
         if (row.count === 0) {
             console.log("Seeding initial hospital data...");
-            const stmt = db.prepare("INSERT INTO hospitals (name, address, city, region) VALUES (?, ?, ?, ?)");
-            // Placeholder data since file upload failed
+            const stmt = db.prepare("INSERT INTO hospitals (name, location, products, system) VALUES (?, ?, ?, ?)");
+            // Placeholder data 
             const seedData = [
-                ["Seoul National University Hospital", "101 Daehak-ro", "Seoul", "Seoul"],
-                ["Asan Medical Center", "88, Olympic-ro 43-gil", "Seoul", "Seoul"],
-                ["Samsung Medical Center", "81 Irwon-ro", "Seoul", "Seoul"],
-                ["Severance Hospital", "50-1 Yonsei-ro", "Seoul", "Seoul"],
-                ["Busan National University Hospital", "179 Gudeok-ro", "Busan", "Busan"]
+                ["Seoul National University Hospital", "Seoul", "LAP", "LUNA3D"],
+                ["Asan Medical Center", "Seoul", "LAP", "LUNA3D"],
+                ["Samsung Medical Center", "Seoul", "LAP", "LUNA3D"],
+                ["Severance Hospital", "Seoul", "LAP", "LUNA3D"],
+                ["Busan National University Hospital", "Busan", "LAP", "LUNA3D"]
             ];
             seedData.forEach(data => stmt.run(data));
             stmt.finalize();
