@@ -599,40 +599,44 @@ h3 {
     font-size: 0.9rem;
   }
 
-  /* Report Header Mobile */
+  /* Report Header Mobile - Modified to Side-by-Side */
   .report-header-container {
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
+    flex-direction: row;
+    /* Keep row layout */
+    align-items: flex-start;
+    /* Align top */
+    gap: 10px;
   }
 
   .logo-section img {
-    max-width: 200px !important;
-    /* Slightly smaller logo */
+    max-width: 150px !important;
+    /* Smaller logo to fit */
   }
 
   .header-info {
-    text-align: center;
-    width: 100%;
+    text-align: right;
+    /* Keep right aligned */
+    width: auto;
+    flex: 1;
+    /* Take remaining space */
   }
 
   .report-header-title {
-    font-size: 1.5rem;
-    text-align: center !important;
-    margin-bottom: 15px;
+    font-size: 1.2rem;
+    /* Reduce size to fit */
+    text-align: right !important;
+    margin-bottom: 5px;
   }
 
   .date-input-wrapper {
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    text-align: right;
+    display: block;
     gap: 5px;
   }
 
   .date-input {
-    width: auto;
-    max-width: 100%;
+    width: 100px;
+    /* specific width */
   }
 
   .report-paper {
@@ -737,15 +741,20 @@ h3 {
     width: 100%;
   }
 
-  /* Buttons */
+  /* Buttons - Side by Side */
   .action-buttons-container {
-    flex-direction: column;
-    gap: 1rem;
+    flex-direction: row;
+    gap: 10px;
     width: 100%;
+    justify-content: space-between;
   }
 
   .action-buttons-container button {
-    width: 100%;
+    width: 48%;
+    /* fit side by side */
+    padding: 10px 0;
+    /* reduce padding if needed */
+    font-size: 1rem;
   }
 
   /* Adjust specific complex rows */
