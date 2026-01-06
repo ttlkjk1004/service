@@ -538,3 +538,134 @@ h3 {
     color: transparent !important;
   }
 }
+
+/* Mobile Responsiveness */
+@media screen and (max-width: 768px) {
+  .container {
+    padding: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .nav-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .nav-links a {
+    margin-left: 0;
+    padding: 0.5rem 0;
+    display: block;
+    width: 100%;
+  }
+
+  .report-paper {
+    padding: 15px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .report-header-title {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  /* Stack Grid Rows */
+  .grid-row {
+    flex-wrap: wrap;
+    border-bottom: 2px solid var(--border-color);
+  }
+
+  .cell {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #eee;
+  }
+
+  .cell:last-child {
+    border-bottom: none;
+  }
+
+  .cell.label {
+    background-color: #f3f4f6;
+    justify-content: flex-start;
+    padding: 8px;
+    min-width: auto;
+  }
+
+  .cell.content {
+    padding: 8px;
+  }
+
+  /* Specifically for the "Type of activity" section */
+  .cell.h-medium {
+    min-height: auto;
+  }
+
+  .checkbox-group {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Hospital Manager Form Stack */
+  .hospital-form .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-group.full-width {
+    grid-column: span 1;
+  }
+
+  /* Signature Section Stack */
+  .signature-section {
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .signature-section>div {
+    width: 100% !important;
+  }
+
+  .signature-name-group input {
+    width: 100% !important;
+  }
+
+  /* Tables Scroll */
+  .table-container,
+  .grid-row:has(.inner-table) {
+    overflow-x: auto;
+    display: block;
+    width: 100%;
+  }
+
+  /* Buttons */
+  .action-buttons-container {
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .action-buttons-container button {
+    width: 100%;
+  }
+
+  /* Adjust specific complex rows */
+  .grid-row .inner-table {
+    min-width: 600px;
+    /* Force scroll on very small screens */
+  }
+
+  /* Header info date input on mobile */
+  .header-info div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
