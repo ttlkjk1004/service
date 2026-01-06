@@ -28,30 +28,28 @@ db.serialize(() => {
         software_version TEXT
     )`);
 
-    // Reports Table - Dropping old table for schema update (Dev mode only)
-    db.run("DROP TABLE IF EXISTS reports", () => {
-        db.run(`CREATE TABLE IF NOT EXISTS reports (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            hospitalId INTEGER,
-            hospitalName TEXT,
-            location TEXT,
-            products TEXT,
-            system TEXT,
-            warranty TEXT,
-            activityType TEXT, -- JSON string
-            deviceDetails TEXT, -- JSON string
-            subject TEXT,
-            serviceDetails TEXT, -- Activity description
-            partsDetails TEXT, -- JSON string
-            serviceHours TEXT, -- JSON string
-            servicerName TEXT,
-            customerName TEXT,
-            serviceDate TEXT,
-            servicerSignature TEXT,
-            customerSignature TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )`);
-    });
+    // Reports Table
+    db.run(`CREATE TABLE IF NOT EXISTS reports (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        hospitalId INTEGER,
+        hospitalName TEXT,
+        location TEXT,
+        products TEXT,
+        system TEXT,
+        warranty TEXT,
+        activityType TEXT, -- JSON string
+        deviceDetails TEXT, -- JSON string
+        subject TEXT,
+        serviceDetails TEXT, -- Activity description
+        partsDetails TEXT, -- JSON string
+        serviceHours TEXT, -- JSON string
+        servicerName TEXT,
+        customerName TEXT,
+        serviceDate TEXT,
+        servicerSignature TEXT,
+        customerSignature TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )`);
 
     // Seed Data (if empty)
     db.get("SELECT count(*) as count FROM hospitals", (err, row) => {
