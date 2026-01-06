@@ -126,12 +126,37 @@ const HospitalManager = () => {
         });
     };
 
+    const handleImport = async () => {
+        if (!confirm('WARNING: This will DELETE all existing hospital data and re-import from the server Excel file. Are you sure?')) return;
+
+        try {
+            setLoading(true);
+            const response = await fetch('/api/hospitals/reset-and-import', { method: 'POST' });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Import failed');
+            }
+            const result = await response.json();
+            alert(`Success! Imported ${result.count} hospitals.`);
+            fetchHospitals();
+        } catch (err) {
+            alert(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     if (loading && hospitals.length === 0) return <div className="loading">Loading hospitals...</div>;
 
     return (
         <div className="hospital-manager animate-fade-in">
             <div className="card manage-card">
-                <h2 className="section-title">{editingId ? 'Edit Hospital' : 'Add New Hospital'}</h2>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h2 className="section-title">{editingId ? 'Edit Hospital' : 'Add New Hospital'}</h2>
+                    <button type="button" onClick={handleImport} className="btn btn-warning" style={{ backgroundColor: '#ffc107', color: '#000' }}>
+                        Reset & Import Data
+                    </button>
+                </div>
                 <form onSubmit={handleSubmit} className="hospital-form">
                     <div className="form-grid">
                         <div className="form-group">

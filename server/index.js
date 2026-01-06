@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const db = require('./database');
+const { importHospitals } = require('./import_data');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -104,6 +105,17 @@ app.delete('/api/hospitals/:id', (req, res) => {
         }
         res.json({ message: 'Hospital deleted successfully' });
     });
+});
+
+// Import/Reset Hospital Data from Excel
+app.post('/api/hospitals/reset-and-import', async (req, res) => {
+    try {
+        const result = await importHospitals(db);
+        res.json({ message: 'Data imported successfully', count: result.count });
+    } catch (error) {
+        console.error('Import failed:', error);
+        res.status(500).json({ error: 'Import failed: ' + error.message });
+    }
 });
 
 // Create Report
