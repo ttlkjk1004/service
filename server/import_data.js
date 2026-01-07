@@ -6,7 +6,27 @@ const fs = require('fs');
 const EXCEL_FILENAME = 'hospital_data.xlsx';
 
 const importHospitals = (db) => {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
+        // Helper to Promisify db.run
+        const run = (sql, params = []) => {
+            return new Promise((res, rej) => {
+                db.run(sql, params, function (err) {
+                    if (err) rej(err);
+                    else res(this);
+                });
+            });
+        };
+
+        // Helper to Promisify db.get
+        const get = (sql, params = []) => {
+            return new Promise((res, rej) => {
+                db.get(sql, params, (err, row) => {
+                    if (err) rej(err);
+                    else res(row);
+                });
+            });
+        };
+
         // Verify file exists
         const filePath = path.join(__dirname, EXCEL_FILENAME);
         if (!fs.existsSync(filePath)) {
@@ -24,22 +44,14 @@ const importHospitals = (db) => {
 
             console.log(`Found ${data.length} records in '${sheetName}' sheet.`);
 
-            // Process each record
-            const processRecords = async () => {
-                let inserted = 0;
-                let updated = 0;
+            // Start Transaction Manually
+            await run("BEGIN TRANSACTION");
 
-                // Prepare statements
-                const checkStmt = db.prepare("SELECT id FROM hospitals WHERE name = ?");
-                const insertStmt = db.prepare(`INSERT INTO hospitals (
-                        name, location, products, system, installation_date, 
-                        device_type, serial_number, revision_firmware, software_version
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`);
-                const updateStmt = db.prepare(`UPDATE hospitals SET
-                        location = ?, products = ?, system = ?, installation_date = ?, 
-                        device_type = ?, serial_number = ?, revision_firmware = ?, software_version = ?
-                        WHERE id = ?`);
+            let inserted = 0;
+            let updated = 0;
+            let errorCount = 0;
 
+            try {
                 for (const row of data) {
                     const name = row['Customer'];
                     if (!name) continue;
@@ -54,70 +66,52 @@ const importHospitals = (db) => {
                     const softwareVersion = row['Software version'];
 
                     try {
-                        // Check if hospital exists
-                        const existing = await new Promise((res, rej) => {
-                            checkStmt.get(name, (err, row) => {
-                                if (err) rej(err);
-                                else res(row);
-                            });
-                        });
+                        // Check existence
+                        const existing = await get("SELECT id FROM hospitals WHERE name = ?", [name]);
 
                         if (existing) {
-                            // Update existing
-                            await new Promise((res, rej) => {
-                                updateStmt.run(
-                                    location, products, system, installationDate,
-                                    deviceType, serialNumber, revisionFirmware, softwareVersion,
-                                    existing.id,
-                                    (err) => err ? rej(err) : res()
-                                );
-                            });
+                            // Update
+                            await run(`UPDATE hospitals SET
+                                location = ?, products = ?, system = ?, installation_date = ?, 
+                                device_type = ?, serial_number = ?, revision_firmware = ?, software_version = ?
+                                WHERE id = ?`, [
+                                location, products, system, installationDate,
+                                deviceType, serialNumber, revisionFirmware, softwareVersion,
+                                existing.id
+                            ]);
                             updated++;
                         } else {
-                            // Insert new
-                            await new Promise((res, rej) => {
-                                insertStmt.run(
-                                    name, location, products, system, installationDate,
-                                    deviceType, serialNumber, revisionFirmware, softwareVersion,
-                                    (err) => err ? rej(err) : res()
-                                );
-                            });
+                            // Insert
+                            await run(`INSERT INTO hospitals (
+                                name, location, products, system, installation_date, 
+                                device_type, serial_number, revision_firmware, software_version
+                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
+                                name, location, products, system, installationDate,
+                                deviceType, serialNumber, revisionFirmware, softwareVersion
+                            ]);
                             inserted++;
                         }
-                    } catch (err) {
-                        console.error(`Error processing ${name}:`, err.message);
+                    } catch (recordError) {
+                        console.error(`Error processing record ${name}:`, recordError.message);
                         errorCount++;
                     }
                 }
 
-                checkStmt.finalize();
-                insertStmt.finalize();
-                updateStmt.finalize();
+                // If we get here, everything is good. Commit.
+                await run("COMMIT");
+                console.log(`Import completed. Added ${inserted}, Updated ${updated} records.`);
+                resolve({ success: true, count: inserted + updated, inserted, updated });
 
-                return { inserted, updated };
-            };
+            } catch (transactionError) {
+                // If main logic fails (unlikely due to inner catch), Rollback
+                console.error("Critical error during processing, rolling back.", transactionError);
+                await run("ROLLBACK");
+                reject(transactionError);
+            }
 
-            processRecords().then(({ inserted, updated }) => {
-                db.run("COMMIT", (err) => {
-                    if (err) {
-                        console.error('Transaction commit failed:', err.message);
-                        db.run("ROLLBACK");
-                        reject(err);
-                    } else {
-                        console.log(`Import completed. Added ${inserted}, Updated ${updated} records.`);
-                        resolve({ success: true, count: inserted + updated, inserted, updated });
-                    }
-                });
-            }).catch(err => {
-                console.error('Error during processing:', err);
-                db.run("ROLLBACK");
-                reject(err);
-            });
-
-
-        } catch (error) {
-            console.error('Error processing Excel file:', error.message);
-            reject(error);
+        } catch (fileError) {
+            console.error('Error processing Excel file:', fileError.message);
+            reject(fileError);
         }
     });
 };
