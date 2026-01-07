@@ -113,12 +113,12 @@ const importHospitals = (db) => {
                 db.run("ROLLBACK");
                 reject(err);
             });
-        });
 
-} catch (error) {
-    console.error('Error processing Excel file:', error.message);
-    reject(error);
-}
+
+        } catch (error) {
+            console.error('Error processing Excel file:', error.message);
+            reject(error);
+        }
     });
 };
 
