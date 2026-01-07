@@ -127,7 +127,7 @@ const HospitalManager = () => {
     };
 
     const handleImport = async () => {
-        if (!confirm('WARNING: This will DELETE all existing hospital data and re-import from the server Excel file. Are you sure?')) return;
+        if (!confirm('This will merge data from the server Excel file.\n\n- Existing hospitals in the file will be UPDATED.\n- New hospitals in the file will be ADDED.\n- Hospitals you added manually that are NOT in the file will be PRESERVED.\n\nProceed?')) return;
 
         try {
             setLoading(true);
@@ -137,7 +137,7 @@ const HospitalManager = () => {
                 throw new Error(errorData.error || 'Import failed');
             }
             const result = await response.json();
-            alert(`Success! Imported ${result.count} hospitals.`);
+            alert(`Import successful!\nTotal processed: ${result.count}`);
             fetchHospitals();
         } catch (err) {
             alert(err.message);
@@ -154,7 +154,7 @@ const HospitalManager = () => {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <h2 className="section-title">{editingId ? 'Edit Hospital' : 'Add New Hospital'}</h2>
                     <button type="button" onClick={handleImport} className="btn btn-warning" style={{ backgroundColor: '#ffc107', color: '#000' }}>
-                        Reset & Import Data
+                        Import Data
                     </button>
                 </div>
                 <form onSubmit={handleSubmit} className="hospital-form">

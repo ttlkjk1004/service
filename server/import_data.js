@@ -24,31 +24,26 @@ const importHospitals = (db) => {
 
             console.log(`Found ${data.length} records in '${sheetName}' sheet.`);
 
-            db.serialize(() => {
-                db.run("BEGIN TRANSACTION");
+            // Process each record
+            const processRecords = async () => {
+                let inserted = 0;
+                let updated = 0;
 
-                // Clear existing data
-                db.run("DELETE FROM hospitals", (err) => {
-                    if (err) {
-                        console.error('Error clearing table:', err.message);
-                        db.run("ROLLBACK");
-                        return reject(err);
-                    }
-                });
+                // Prepare statements
+                const checkStmt = db.prepare("SELECT id FROM hospitals WHERE name = ?");
+                const insertStmt = db.prepare(`INSERT INTO hospitals (
+                        name, location, products, system, installation_date, 
+                        device_type, serial_number, revision_firmware, software_version
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+                const updateStmt = db.prepare(`UPDATE hospitals SET
+                        location = ?, products = ?, system = ?, installation_date = ?, 
+                        device_type = ?, serial_number = ?, revision_firmware = ?, software_version = ?
+                        WHERE id = ?`);
 
-                // Reset ID counter
-                db.run("DELETE FROM sqlite_sequence WHERE name='hospitals'");
-
-                const stmt = db.prepare(`INSERT INTO hospitals (
-                    name, location, products, system, installation_date, 
-                    device_type, serial_number, revision_firmware, software_version
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`);
-
-                let successCount = 0;
-                let errorCount = 0;
-
-                data.forEach((row) => {
+                for (const row of data) {
                     const name = row['Customer'];
+                    if (!name) continue;
+
                     const location = row['Location'];
                     const products = row['Products'];
                     const system = row['System'];
@@ -58,36 +53,72 @@ const importHospitals = (db) => {
                     const revisionFirmware = row['Revision/Firmware'];
                     const softwareVersion = row['Software version'];
 
-                    if (name) {
-                        stmt.run(
-                            name, location, products, system, installationDate,
-                            deviceType, serialNumber, revisionFirmware, softwareVersion,
-                            (err) => {
-                                if (err) errorCount++;
-                            }
-                        );
-                        successCount++;
+                    try {
+                        // Check if hospital exists
+                        const existing = await new Promise((res, rej) => {
+                            checkStmt.get(name, (err, row) => {
+                                if (err) rej(err);
+                                else res(row);
+                            });
+                        });
+
+                        if (existing) {
+                            // Update existing
+                            await new Promise((res, rej) => {
+                                updateStmt.run(
+                                    location, products, system, installationDate,
+                                    deviceType, serialNumber, revisionFirmware, softwareVersion,
+                                    existing.id,
+                                    (err) => err ? rej(err) : res()
+                                );
+                            });
+                            updated++;
+                        } else {
+                            // Insert new
+                            await new Promise((res, rej) => {
+                                insertStmt.run(
+                                    name, location, products, system, installationDate,
+                                    deviceType, serialNumber, revisionFirmware, softwareVersion,
+                                    (err) => err ? rej(err) : res()
+                                );
+                            });
+                            inserted++;
+                        }
+                    } catch (err) {
+                        console.error(`Error processing ${name}:`, err.message);
+                        errorCount++;
                     }
-                });
+                }
 
-                stmt.finalize();
+                checkStmt.finalize();
+                insertStmt.finalize();
+                updateStmt.finalize();
 
+                return { inserted, updated };
+            };
+
+            processRecords().then(({ inserted, updated }) => {
                 db.run("COMMIT", (err) => {
                     if (err) {
                         console.error('Transaction commit failed:', err.message);
                         db.run("ROLLBACK");
                         reject(err);
                     } else {
-                        console.log(`Import completed. Added ${successCount} records.`);
-                        resolve({ success: true, count: successCount });
+                        console.log(`Import completed. Added ${inserted}, Updated ${updated} records.`);
+                        resolve({ success: true, count: inserted + updated, inserted, updated });
                     }
                 });
+            }).catch(err => {
+                console.error('Error during processing:', err);
+                db.run("ROLLBACK");
+                reject(err);
             });
+        });
 
-        } catch (error) {
-            console.error('Error processing Excel file:', error.message);
-            reject(error);
-        }
+} catch (error) {
+    console.error('Error processing Excel file:', error.message);
+    reject(error);
+}
     });
 };
 
